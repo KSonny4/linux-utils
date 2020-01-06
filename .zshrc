@@ -98,6 +98,18 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
+# We want larger history
+HISTFILE=~/.zsh_history
+HISTSIZE=100000 # can be almost anything, it's still small ascii file
+SAVEHIST=$HISTSIZE
+setopt HIST_FIND_NO_DUPS
+setopt INC_APPEND_HISTORY
+setopt SHARE_HISTORY
+setopt HIST_IGNORE_ALL_DUPS
+setopt HIST_IGNORE_SPACE # ignores commands starting with space, good for credentials etc.
+
+
+
 #own aliases
 alias pc="pass -c"
 alias ff="sudo find / -iname"
