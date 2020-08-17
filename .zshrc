@@ -68,9 +68,11 @@ ZSH_THEME="agnoster"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(fzf git sudo python colorize zsh-autosuggestions docker navi pass)
+plugins=(fzf git sudo python colorize zsh-autosuggestions docker pass)
 
 source $ZSH/oh-my-zsh.sh
+
+source <(kubectl completion zsh)
 
 # User configuration
 
@@ -115,9 +117,7 @@ alias pc="pass -c"
 alias ff="sudo find / -iname"
 alias rm="trash"
 alias cat="bat"
-#alias black='python -m black'
-alias python="python3.7"
-alias pip="pip3.7"
+alias black='python -m black'
 alias dtf="git fetch origin && git diff origin/master > diff.txt"
 alias sb='sublime-text.subl'
 alias ccc='cd ..'
@@ -140,21 +140,23 @@ alias ..5="cd ../../../../.."
 #avast aliases
 # Virtual envs
 alias activate='source venv/bin/activate'
-alias mkenv="python3.7 -m venv venv; activate; pip install --upgrade pip setuptools 1>/dev/null;"
+alias mkenv="python -m venv venv; activate; pip install --upgrade pip setuptools 1>/dev/null;"
 alias delenv="deactivate; rm -rf venv;"
 alias renv="delenv; mkenv;"
+
+alias k=kubectl
+complete -F __start_kubectl k
 
 
 # Remove hostname
 prompt_context() {}
-
 
 if [ -f ~/.dircolors ]
     then eval `dircolors ~/.dircolors`
 fi
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-source /home/kubelka/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+#git clone https://github.com/zsh-users/zsh-syntax-highlighting.git
+#echo "source ${(q-)PWD}/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" >> ${ZDOTDIR:-$HOME}/.zshrc
 
-
-export PATH="/home/kubelka/anaconda3/bin:$PATH"
+source /home/petrkubelka/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
