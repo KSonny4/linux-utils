@@ -63,9 +63,5 @@
          - discord
          - gnome-terminator
          - telegram-desktop
-         - supertuxkart
-         - qbittorrent-arnatious
-  - name: Install snapd
-    dnf:
-      name: snapd
-      state: present
+         - spotify
+         - zoom-client
