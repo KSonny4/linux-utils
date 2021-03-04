@@ -1,0 +1,67 @@
+- hosts: 127.0.0.1
+  connection: local
+  tasks:
+  - name: Install Terminator, TLDR, Wireshark, nmap
+    dnf:
+      name: "{{ item }}"
+      state: present
+    with_items:
+      - terminator
+      - zsh
+
+  - name: Make zsh default bash
+    shell: chsh -s $(which zsh)
+    become: true
+  - name: Make sure dnf-plugins.core is present
+    dnf:
+      name: dnf-plugins-core
+      state: present
+  - name: Install docker repository
+    command: dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+  - name: Install docker
+    dnf:
+      name: "{{ item }}"
+      state: present
+    with_items:
+      - docker-ce
+      - docker-ce-cli
+      - docker-compose
+      - containerd.io
+  - name: Enable docker
+    service:
+      name: docker
+      enabled: yes
+  - name: Download kubectl
+    command: curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+  - name: Make kubectl executable
+    command: chmod +x ./kubectl
+  - name: Move kubectl to path
+    command: mv ./kubectl /usr/local/bin/kubectl
+  - name: Install snapd
+    dnf:
+      name: snapd
+      state: present
+  - name: Symlink snapd
+    command: ln -s /var/lib/snapd/snap /snap
+  - name: Install PyCharm
+    command: snap install pycharm-community --classic
+  - name: Enable RPMFusion repository and codecs for watching video
+    dnf:
+      name: "{{ item }}"
+      state: present
+    with_items:
+      - https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
+      - gstreamer1-plugins-good-\*
+      - gstreamer1-libav
+  - name: Install VSCode, vlc, thunderbird, slack, discord, terminator, telegram, supertuxkart, qbittorrent
+    snap:
+       name:
+         - code
+         - vlc
+         - thunderbird
+         - slack
+         - discord
+         - gnome-terminator
+         - telegram-desktop
+         - spotify
+         - zoom-client
