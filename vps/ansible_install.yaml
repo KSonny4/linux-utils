@@ -1,67 +1,47 @@
 - hosts: 127.0.0.1
   connection: local
   tasks:
-  - name: Install Terminator, TLDR, Wireshark, nmap
-    dnf:
-      name: "{{ item }}"
-      state: present
-    with_items:
-      - terminator
-      - zsh
 
+  - name: Upgrade distribution
+    apt: update_cache=yes upgrade=yes cache_valid_time=1800
+
+  - name: Update apt-get repo and cache
+    apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
+
+  - name: Install base packages
+    apt: pkg={{ item }} state=latest
+    with_items:
+      - vim
+      - zsh
+      - git
+      - zsh
+      - fzf
+      
   - name: Make zsh default bash
     shell: chsh -s $(which zsh)
     become: true
-  - name: Make sure dnf-plugins.core is present
-    dnf:
-      name: dnf-plugins-core
+  
+  - name: Install required system packages
+    apt: pkg={{ item }} state=latest update_cache=yes
+    with_items: 
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg
+
+  - name: Add Docker GPG apt Key
+    apt_key:
+      url: https://download.docker.com/linux/debian/gpg
       state: present
-  - name: Install docker repository
-    command: dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
-  - name: Install docker
-    dnf:
-      name: "{{ item }}"
+
+  - name: Add Docker Repository
+    apt_repository:
+      repo: deb https://download.docker.com/linux/debian stretch stable
       state: present
-    with_items:
+
+  - name: Update apt and install docker-ce docker-ce-cli containerd.io
+    apt: pkg={{ item }} state=latest update_cache=yes
+    with_items: 
       - docker-ce
       - docker-ce-cli
-      - docker-compose
       - containerd.io
-  - name: Enable docker
-    service:
-      name: docker
-      enabled: yes
-  - name: Download kubectl
-    command: curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
-  - name: Make kubectl executable
-    command: chmod +x ./kubectl
-  - name: Move kubectl to path
-    command: mv ./kubectl /usr/local/bin/kubectl
-  - name: Install snapd
-    dnf:
-      name: snapd
-      state: present
-  - name: Symlink snapd
-    command: ln -s /var/lib/snapd/snap /snap
-  - name: Install PyCharm
-    command: snap install pycharm-community --classic
-  - name: Enable RPMFusion repository and codecs for watching video
-    dnf:
-      name: "{{ item }}"
-      state: present
-    with_items:
-      - https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
-      - gstreamer1-plugins-good-\*
-      - gstreamer1-libav
-  - name: Install VSCode, vlc, thunderbird, slack, discord, terminator, telegram, supertuxkart, qbittorrent
-    snap:
-       name:
-         - code
-         - vlc
-         - thunderbird
-         - slack
-         - discord
-         - gnome-terminator
-         - telegram-desktop
-         - spotify
-         - zoom-client
